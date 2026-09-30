@@ -60,6 +60,8 @@ export default function ReportIssue() {
   const [status, setStatus] = useState(speechSupported ? 'idle' : 'unsupported')
   const [notice, setNotice] = useState('')
   const [validation, setValidation] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const analyzingRef = useRef(false)
 
   useEffect(() => {
     document.title = 'Report a Public Issue · VoiceWitness AI'
@@ -234,16 +236,46 @@ export default function ReportIssue() {
     setNotice('Language updated. Click Start Speaking to listen again.')
   }
 
-  function analyzeIssue() {
+  async function analyzeIssue() {
     const text = description.trim()
     if (!text) {
       setValidation('Please describe the issue before continuing.')
       textRef.current?.focus()
       return
     }
+    if (analyzingRef.current) return
 
     if (status === 'listening') stopListening()
-    navigate('/analysis', { state: { description: text } })
+    analyzingRef.current = true
+    setIsAnalyzing(true)
+    setValidation('')
+
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      const body = await response.json().catch(() => null)
+
+      if (!response.ok || !body?.success || !body.data) {
+        if (body?.error === 'AI service is not configured yet.') {
+          setValidation('AI service is not configured yet.')
+        } else if (response.status === 400) {
+          setValidation('Please provide a valid issue description.')
+        } else {
+          setValidation("We couldn't analyze your report right now. Please try again.")
+        }
+        return
+      }
+
+      navigate('/analysis', { state: { description: text, analysis: body.data } })
+    } catch {
+      setValidation("We couldn't analyze your report right now. Please try again.")
+    } finally {
+      analyzingRef.current = false
+      setIsAnalyzing(false)
+    }
   }
 
   function clearReport() {
@@ -364,14 +396,21 @@ export default function ReportIssue() {
             {validation}
           </p>
         ) : null}
+        {isAnalyzing ? (
+          <p className="voice-note" role="status">
+            Understanding your report...
+          </p>
+        ) : null}
         <div className="actions">
-          <Button onClick={analyzeIssue}>Analyze Issue</Button>
-          <Button variant="secondary" onClick={clearReport}>
+          <Button onClick={analyzeIssue} disabled={isAnalyzing}>
+            {isAnalyzing ? 'Understanding your report...' : 'Analyze Issue'}
+          </Button>
+          <Button variant="secondary" onClick={clearReport} disabled={isAnalyzing}>
             Clear
           </Button>
         </div>
         <p className="hint">
-          Analyze Issue opens a sample analysis. Your words are not sent to an AI yet.
+          Analyze Issue sends your description to the VoiceWitness server. The AI key stays there.
         </p>
       </div>
     </section>

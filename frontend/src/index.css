@@ -237,6 +237,11 @@ main {
   color: var(--teal);
 }
 
+.btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .card,
 .slip,
 .report-sheet {
@@ -604,6 +609,25 @@ textarea {
 .badge-medium {
   background: #fff3df;
   color: #8a4b08;
+}
+
+.badge-low {
+  background: #e7f2f0;
+  color: #0b5553;
+}
+
+.safety-note {
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid #e6c98a;
+  border-radius: 16px;
+  background: #fff8ec;
+}
+
+.safety-note h2 {
+  margin-bottom: 0.35rem;
+  color: #8a4b08;
+  font-size: 1.25rem;
 }
 
 .timeline {
