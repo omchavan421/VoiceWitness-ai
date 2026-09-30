@@ -1,3 +1,3 @@
 # VoiceWitness frontend
 
-React app created with Vite. See the root [README](../README.md) for how to install dependencies and start this app.
+React screens for reporting a public issue. See the root [README](../README.md) for how to install dependencies and start this app.

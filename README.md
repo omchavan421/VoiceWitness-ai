@@ -2,21 +2,20 @@
 
 See a Problem. Speak It. Route It.
 
-VoiceWitness AI is a voice-first public issue reporting project. This repository is at **Phase 1: project foundation**.
+VoiceWitness AI is a voice-first public issue reporting project. This repository is at **Phase 2: frontend UI**.
 
 What exists now:
 
-- A React + Vite frontend that shows the project name.
+- A React + Vite frontend with the reporting screens and sample reports.
 - An Express backend with one health-check route.
 
 What is intentionally not built yet:
 
-- Voice input
+- Real voice input
 - Gemini
-- Follow-up questions
-- Reports
 - Supabase
 - Authentication
+- Saving a submitted report
 
 ## Project layout
 
@@ -48,7 +47,17 @@ npm run dev:frontend
 
 Open [http://localhost:43173](http://localhost:43173).
 
-You should see **VoiceWitness AI** and the tagline **See a Problem. Speak It. Route It.**
+You should see the home page: **See a Problem. Speak It. Route It.**
+
+Click through the sample flow:
+
+1. **Start Speaking** opens Report Issue.
+2. **Analyze Issue** opens the sample analysis.
+3. **View Report** opens the draft report.
+4. **Submit Report** opens My Reports.
+5. **View Details** on VW1024 opens that case.
+
+The same pages are in the top navigation: Home, Report Issue, and My Reports.
 
 ## Start the backend
 
