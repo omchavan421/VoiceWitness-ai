@@ -370,6 +370,71 @@ main {
   transform: translateY(-2px);
 }
 
+.mic-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.mic-button.listening {
+  background: radial-gradient(circle at 35% 30%, #e25b5b, #9f2d2d 62%);
+  box-shadow: 0 0 0 0 rgba(159, 45, 45, 0.45);
+  animation: mic-pulse 1.4s ease-in-out infinite;
+}
+
+.live-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+}
+
+.language-select {
+  align-self: stretch;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 0.4rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #b7c9c3;
+  border-radius: 14px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+
+.language-hint {
+  align-self: stretch;
+  margin-top: 0.45rem;
+  text-align: left;
+}
+
+.interim {
+  align-self: stretch;
+  margin-top: 0.55rem;
+  text-align: left;
+  color: var(--ink-soft);
+}
+
+.form-alert {
+  align-self: stretch;
+  margin-top: 0.75rem;
+  text-align: left;
+  color: #8d2424;
+  font-weight: 750;
+}
+
+@keyframes mic-pulse {
+  70% {
+    box-shadow: 0 0 0 14px rgba(159, 45, 45, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic-button.listening {
+    animation: none;
+  }
+}
+
 .voice-note,
 .or-type,
 .hint {
