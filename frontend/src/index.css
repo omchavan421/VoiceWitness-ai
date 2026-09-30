@@ -496,8 +496,18 @@ textarea {
   margin-top: 1.3rem;
 }
 
+.issue-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .issue-card h2 {
   font-size: 1.45rem;
+}
+
+.issue-card .btn {
+  margin-top: auto;
 }
 
 .report-id {
