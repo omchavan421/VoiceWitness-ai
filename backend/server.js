@@ -8,7 +8,8 @@ dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 47821
-const frontendUrl = (process.env.FRONTEND_URL || '').trim().replace(/\/$/, '')
+const frontendUrl = normalizeOrigin(process.env.FRONTEND_URL)
+const productionOrigin = 'https://voicewitness-ai-public.vercel.app'
 
 app.use(cors({
   origin(origin, callback) {
@@ -18,6 +19,8 @@ app.use(cors({
     }
     callback(null, false)
   },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
 }))
 app.use(express.json())
 
@@ -49,6 +52,7 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     console.error('AI analysis failed:', safeErrorMessage(error))
+    res.set('X-VoiceWitness-Error', publicFailureKind(error))
     return res.status(500).json({
       success: false,
       error: 'AI analysis failed. Please try again.',
@@ -71,13 +75,33 @@ app.use((error, req, res, next) => {
   })
 })
 
+function normalizeOrigin(value) {
+  return (value || '').trim().replace(/\/$/, '')
+}
+
 function isAllowedOrigin(origin) {
   if (!origin) return true
 
-  const normalized = origin.replace(/\/$/, '')
+  const normalized = normalizeOrigin(origin)
+  if (normalized === productionOrigin) return true
   if (frontendUrl && normalized === frontendUrl) return true
 
   return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalized)
+}
+
+function publicFailureKind(error) {
+  const status = Number(error?.cause?.status || error?.status || 0)
+  const message = String(error?.cause?.message || error?.message || '')
+  if (
+    status === 400 ||
+    status === 401 ||
+    status === 403 ||
+    /API key not valid|API_KEY_INVALID|PERMISSION_DENIED/.test(message)
+  ) {
+    return 'auth'
+  }
+  if (status === 404 || /NOT_FOUND|not found/i.test(message)) return 'model'
+  return 'upstream'
 }
 
 function safeErrorMessage(error) {

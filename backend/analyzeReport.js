@@ -3,7 +3,12 @@ import { z } from 'zod'
 
 // gemini-3.8-flash is the current Flash model. The lite alias is only a backup
 // when Flash is temporarily busy.
-const MODELS = ['gemini-3.8-flash', 'gemini-flash-lite-latest']
+const MODELS = [
+  'gemini-3.8-flash',
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash',
+]
 
 export const issueRequestSchema = z.object({
   text: z.string().trim().min(5).max(5000),
@@ -90,7 +95,27 @@ Rules:
 Useful categories include Road Safety, Street Lighting, Electricity, Water & Drainage, Waste Management, Public Transport, Traffic, Public Infrastructure, Public Safety, Environment, Animal-related, and Other. Choose another clear category only when none of these fit.`
 
 function readApiKey() {
-  return process.env.GEMINI_API_KEY?.trim() || ''
+  let value = process.env.GEMINI_API_KEY?.trim() || ''
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    value = value.slice(1, -1).trim()
+  }
+  return value
+}
+
+function shouldTryNextModel(error) {
+  const status = Number(error?.status)
+  if ([404, 408, 429, 500, 502, 503, 504].includes(status)) return true
+  const message = String(error?.message || '')
+  return (
+    message.includes('503') ||
+    message.includes('UNAVAILABLE') ||
+    message.includes('high demand') ||
+    message.includes('NOT_FOUND') ||
+    message.includes('not found')
+  )
 }
 
 function normalizeModelJson(value) {
@@ -149,9 +174,7 @@ export async function analyzePublicIssue(text) {
       break
     } catch (error) {
       lastError = error
-      const message = String(error?.message || '')
-      const busy = message.includes('503') || message.includes('UNAVAILABLE') || message.includes('high demand')
-      if (!busy) break
+      if (!shouldTryNextModel(error)) break
     }
   }
 
