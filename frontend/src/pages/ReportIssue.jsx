@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { apiUrl } from '../api'
 import Button from '../components/Button'
 
 const DRAFT_KEY = 'voicewitness-draft-text'
@@ -251,7 +252,7 @@ export default function ReportIssue() {
     setValidation('')
 
     try {
-      const response = await fetch('/api/analyze', {
+      const response = await fetch(apiUrl('/api/analyze'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),

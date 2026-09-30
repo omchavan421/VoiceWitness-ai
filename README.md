@@ -88,3 +88,19 @@ cp backend/.env.example backend/.env
 ```
 
 `backend/.env.example` lists `GEMINI_API_KEY` with an empty value. Do not put a real key in frontend code or in Git. `.env` files are ignored.
+
+## Deployment
+
+The backend is deployed on Render. The frontend is deployed on Vercel.
+
+On Render, set the root directory to `backend`, the start command to `npm start`, and add these environment variables:
+
+- `GEMINI_API_KEY` — your Gemini key. Create a new one if an older key was shared. Do not put it in Git.
+- `FRONTEND_URL` — the Vercel site URL, with no slash at the end.
+- `PORT` — Render sets this. You can leave it unset.
+
+On Vercel, set the root directory to `frontend` and add:
+
+- `VITE_API_URL` — the Render backend URL, with no slash at the end. Example shape: `https://your-service.onrender.com`
+
+Local development still uses `http://localhost:47821` when `VITE_API_URL` is empty.

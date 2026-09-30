@@ -8,8 +8,17 @@ dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 47821
+const frontendUrl = (process.env.FRONTEND_URL || '').trim().replace(/\/$/, '')
 
-app.use(cors())
+app.use(cors({
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true)
+      return
+    }
+    callback(null, false)
+  },
+}))
 app.use(express.json())
 
 app.get('/api/health', (req, res) => {
@@ -61,6 +70,15 @@ app.use((error, req, res, next) => {
     error: 'AI analysis failed. Please try again.',
   })
 })
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true
+
+  const normalized = origin.replace(/\/$/, '')
+  if (frontendUrl && normalized === frontendUrl) return true
+
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalized)
+}
 
 function safeErrorMessage(error) {
   const secret = process.env.GEMINI_API_KEY?.trim()
