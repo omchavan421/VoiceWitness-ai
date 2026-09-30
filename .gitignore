@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Secrets and local environment files.
+# .env.example is kept so other people know which variable names to set.
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+dist-ssr/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS and editor files
+.DS_Store
